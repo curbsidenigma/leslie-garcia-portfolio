@@ -435,7 +435,7 @@
       /* Single 2-stop gradient in oklab — the eye can't detect bands because
      there are no mid-stops to create slope changes (Mach banding). */
       background:
-        linear-gradient(in oklab 90deg, var(--bg) 15%, #8a556a 60%);
+        linear-gradient(in oklab 90deg, var(--bg) 15%, #8a556a 50%);
       pointer-events: none;
     }
 
@@ -458,9 +458,9 @@
       bottom: 0;
       right: 0;
       height: 100%;
-      width: 50%;
+      width: 60%;
       object-fit: cover;
-      object-position: 35% center;
+      object-position: 30% center;
       filter: saturate(.92) contrast(1.02);
       pointer-events: none;
       z-index: 1;
