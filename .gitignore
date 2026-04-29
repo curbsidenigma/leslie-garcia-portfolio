@@ -6,3 +6,4 @@ Thumbs.db
 *.log
 node_modules/
 *.psd
+assets/gallery/originals/

@@ -344,59 +344,27 @@
           </p>
         </div>
 
-        <div class="gallery-grid">
-          <div class="ph g-item reveal">
-            <span class="ph-label"
-              >Foto 01 · Escenario · Cuerpo entero · vertical</span
-            >
-            <div class="overlay">
-              <div class="t">Pieza principal — vertical completa</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d1">
-            <span class="ph-label">Foto 02 · Detalle · Manos en el tubo</span>
-            <div class="overlay">
-              <div class="t">Detalle · agarre</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d2">
-            <span class="ph-label">Foto 03 · Horizontal · Acto en vuelo</span>
-            <div class="overlay">
-              <div class="t">Acto en vuelo</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d1">
-            <span class="ph-label">Foto 04 · Retrato en b/n</span>
-            <div class="overlay">
-              <div class="t">Retrato editorial</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d2">
-            <span class="ph-label">Foto 05 · Full body dinámica</span>
-            <div class="overlay">
-              <div class="t">Figura · plano abierto</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d3">
-            <span class="ph-label">Foto 06 · Vestuario · Cercana</span>
-            <div class="overlay">
-              <div class="t">Vestuario · textura</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d2">
-            <span class="ph-label">Foto 07 · Escenario panorámico</span>
-            <div class="overlay">
-              <div class="t">Escena completa</div>
-            </div>
-          </div>
-          <div class="ph g-item reveal d3">
-            <span class="ph-label">Foto 08 · Backstage — ambiente</span>
-            <div class="overlay">
-              <div class="t">Backstage</div>
-            </div>
-          </div>
-        </div>
+        <div class="gallery-filters reveal d2" id="galleryFilters" role="tablist" aria-label="Filtrar por serie"></div>
+
+        <div class="gallery-grid" id="galleryGrid" aria-live="polite"></div>
+
+        <noscript>
+          <p style="color: var(--fg-dim); margin-top: 24px">
+            Habilita JavaScript para ver la galería. O escríbeme directamente
+            para recibir el portafolio en PDF.
+          </p>
+        </noscript>
       </div>
+
+      <dialog class="lightbox" id="lightbox" aria-label="Visor de imagen">
+        <button class="lb-close" id="lbClose" aria-label="Cerrar">×</button>
+        <button class="lb-nav lb-prev" id="lbPrev" aria-label="Anterior">‹</button>
+        <button class="lb-nav lb-next" id="lbNext" aria-label="Siguiente">›</button>
+        <figure class="lb-figure">
+          <img id="lbImg" alt="" />
+          <figcaption class="lb-caption" id="lbCaption"></figcaption>
+        </figure>
+      </dialog>
     </section>
 
     <hr class="rule" />
@@ -734,5 +702,6 @@
       src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
     ></script>
     <script src="js/main.js" defer></script>
+    <script src="js/gallery.js" defer></script>
   </body>
 </html>
