@@ -1,150 +1,176 @@
 (() => {
-  const grid = document.getElementById('galleryGrid');
-  const filtersEl = document.getElementById('galleryFilters');
-  const lightbox = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lbImg');
-  const lbCaption = document.getElementById('lbCaption');
-  const lbClose = document.getElementById('lbClose');
-  const lbPrev = document.getElementById('lbPrev');
-  const lbNext = document.getElementById('lbNext');
-  if (!grid || !filtersEl) return;
+  // Inline series catalogue. `picks` is the curated photo order (1-indexed)
+  // matching files `{slug}-{NN}-{thumb|mid}.webp` on disk.
+  const SERIES = {
+    'sesion-rawlight-polemaniamx': {
+      label: 'RawLight × Polemania MX',
+      count: 7,
+    },
+    'luna': {
+      label: 'Luna',
+      count: 8,
+    },
+    'retratos-2026': {
+      label: 'Retratos · 2026',
+      count: 7,
+    },
+    'agua-y-mezcal': {
+      label: 'Agua y Mezcal',
+      count: 6,
+    },
+    'aerialarts-2025': {
+      label: 'Aerial Arts · 2025',
+      count: 5,
+    },
+  };
 
-  let manifest = null;
-  let visibleItems = [];
-  let activeFilter = 'all';
-  let lbIndex = 0;
+  const INTERVAL = 4800;
 
-  fetch('assets/gallery/manifest.json', { cache: 'no-cache' })
-    .then(r => r.json())
-    .then(data => {
-      manifest = data;
-      renderFilters();
-      applyFilter('all');
-    })
-    .catch(err => {
-      grid.innerHTML = '<p style="color: var(--fg-dim)">No se pudo cargar la galería.</p>';
-      console.error('gallery manifest load failed', err);
-    });
-
-  function renderFilters() {
-    const total = manifest.series.reduce((n, s) => n + s.items.length, 0);
-    const chips = [
-      makeChip('all', 'Todas', total),
-      ...manifest.series.map(s => makeChip(s.slug, s.label, s.items.length)),
-    ];
-    filtersEl.replaceChildren(...chips);
+  function buildItems(slug, count) {
+    const items = [];
+    for (let i = 1; i <= count; i++) {
+      const id = `${slug}-${String(i).padStart(2, '0')}`;
+      items.push({
+        thumb: `assets/gallery/${id}-thumb.webp`,
+        mid: `assets/gallery/${id}-mid.webp`,
+      });
+    }
+    return items;
   }
 
-  function makeChip(slug, label, count) {
-    const btn = document.createElement('button');
-    btn.className = 'g-chip';
-    btn.type = 'button';
-    btn.role = 'tab';
-    btn.dataset.filter = slug;
-    btn.innerHTML = `<span>${label}</span><i>${count}</i>`;
-    btn.addEventListener('click', () => applyFilter(slug));
-    return btn;
-  }
-
-  function applyFilter(slug) {
-    activeFilter = slug;
-    filtersEl.querySelectorAll('.g-chip').forEach(c => {
-      c.classList.toggle('on', c.dataset.filter === slug);
-      c.setAttribute('aria-selected', c.dataset.filter === slug ? 'true' : 'false');
-    });
-    visibleItems = [];
-    manifest.series.forEach(s => {
-      if (slug !== 'all' && s.slug !== slug) return;
-      s.items.forEach(item => visibleItems.push({ ...item, seriesLabel: s.label }));
-    });
-    renderGrid();
-  }
-
-  function renderGrid() {
-    grid.replaceChildren(
-      ...visibleItems.map((item, idx) => {
-        const fig = document.createElement('button');
-        fig.className = 'g-item';
-        fig.type = 'button';
-        fig.style.setProperty('--ratio', item.ratio);
-        fig.dataset.index = idx;
-        fig.setAttribute('aria-label', `Abrir imagen — ${item.seriesLabel}`);
-        const img = document.createElement('img');
-        img.src = item.thumb;
-        img.alt = item.seriesLabel;
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.width = item.w;
-        img.height = item.h;
-        fig.appendChild(img);
-        const cap = document.createElement('span');
-        cap.className = 'g-item-cap';
-        cap.textContent = item.seriesLabel;
-        fig.appendChild(cap);
-        fig.addEventListener('click', () => openLightbox(idx));
-        return fig;
-      })
+  function init() {
+    const tiles = Array.from(
+      document.querySelectorAll('.g-carousel[data-series]')
     );
+    if (!tiles.length) return;
+
+    tiles.forEach((tile, i) => {
+      if (tile.dataset.hydrated === '1') return;
+      const slug = tile.dataset.series;
+      const meta = SERIES[slug];
+      if (!meta || !meta.count) {
+        console.warn('Gallery: unknown or empty series', slug);
+        return;
+      }
+      tile.dataset.hydrated = '1';
+      const items = buildItems(slug, meta.count);
+      initCarousel(tile, { slug, label: meta.label, items }, i);
+    });
   }
 
-  function openLightbox(idx) {
-    lbIndex = idx;
-    showCurrent();
-    if (typeof lightbox.showModal === 'function') lightbox.showModal();
-    else lightbox.setAttribute('open', '');
-    document.body.style.overflow = 'hidden';
+  function initCarousel(tile, series, tileIdx) {
+    const items = series.items;
+    const slidesEl = document.createElement('div');
+    slidesEl.className = 'g-slides';
+
+    items.forEach((item, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'g-slide' + (i === 0 ? ' on' : '');
+      const img = document.createElement('img');
+      img.src = item.thumb;
+      img.srcset = `${item.thumb} 800w, ${item.mid} 1400w`;
+      img.sizes = '(max-width: 900px) 100vw, 50vw';
+      img.alt = `${series.label} — ${String(i + 1).padStart(2, '0')}`;
+      img.loading = i < 2 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      img.draggable = false;
+      slide.appendChild(img);
+      slidesEl.appendChild(slide);
+    });
+
+    const cover = document.createElement('div');
+    cover.className = 'g-cover';
+    const chevron = (dir) => `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="${dir === 'prev' ? '15 5 8 12 15 19' : '9 5 16 12 9 19'}"/></svg>`;
+    cover.innerHTML = `
+      <div class="g-meta">
+        <span class="g-label">${series.label}</span>
+        <span class="g-count" aria-live="polite"><i class="cur">01</i><i>/</i><i>${String(items.length).padStart(2, '0')}</i></span>
+      </div>
+      <div class="g-nav">
+        <button class="g-arrow prev" type="button" aria-label="Imagen anterior">${chevron('prev')}</button>
+        <button class="g-arrow next" type="button" aria-label="Imagen siguiente">${chevron('next')}</button>
+      </div>
+      <div class="g-bar" aria-hidden="true"><i></i></div>
+    `;
+
+    tile.appendChild(slidesEl);
+    tile.appendChild(cover);
+
+    const slideEls = slidesEl.querySelectorAll('.g-slide');
+    const counter = cover.querySelector('.g-count .cur');
+    const bar = cover.querySelector('.g-bar i');
+    const prevBtn = cover.querySelector('.prev');
+    const nextBtn = cover.querySelector('.next');
+
+    let current = 0;
+    let timer = null;
+    let paused = false;
+
+    function go(i) {
+      const next = (i + items.length) % items.length;
+      if (next === current) return;
+      slideEls[current].classList.remove('on');
+      slideEls[next].classList.add('on');
+      current = next;
+      counter.textContent = String(current + 1).padStart(2, '0');
+      const upcoming = slideEls[
+        (current + 1) % items.length
+      ].querySelector('img');
+      if (upcoming && upcoming.loading === 'lazy') upcoming.loading = 'eager';
+      restartBar();
+    }
+
+    function restartBar() {
+      bar.style.transition = 'none';
+      bar.style.transform = 'scaleX(0)';
+      void bar.offsetHeight; // reflow
+      if (!paused) {
+        bar.style.transition = `transform ${INTERVAL}ms linear`;
+        bar.style.transform = 'scaleX(1)';
+      }
+    }
+
+    function start() {
+      stop();
+      restartBar();
+      timer = window.setInterval(() => {
+        if (!paused) go(current + 1);
+      }, INTERVAL);
+    }
+
+    function stop() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    prevBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      go(current - 1);
+      start();
+    });
+    nextBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      go(current + 1);
+      start();
+    });
+
+    tile.addEventListener('mouseenter', () => {
+      paused = true;
+      bar.style.transition = 'none';
+    });
+    tile.addEventListener('mouseleave', () => {
+      paused = false;
+      restartBar();
+    });
+
+    setTimeout(start, tileIdx * 700);
   }
 
-  function closeLightbox() {
-    if (typeof lightbox.close === 'function') lightbox.close();
-    else lightbox.removeAttribute('open');
-    document.body.style.overflow = '';
-    lbImg.src = '';
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-
-  function showCurrent() {
-    const item = visibleItems[lbIndex];
-    if (!item) return;
-    lbImg.src = item.full || item.mid;
-    lbImg.alt = item.seriesLabel;
-    lbCaption.textContent = `${item.seriesLabel} · ${lbIndex + 1} / ${visibleItems.length}`;
-  }
-
-  function step(delta) {
-    if (!visibleItems.length) return;
-    lbIndex = (lbIndex + delta + visibleItems.length) % visibleItems.length;
-    showCurrent();
-  }
-
-  lbClose.addEventListener('click', closeLightbox);
-  lbPrev.addEventListener('click', () => step(-1));
-  lbNext.addEventListener('click', () => step(+1));
-
-  lightbox.addEventListener('click', e => {
-    // click on backdrop (the dialog itself, not its children) closes
-    if (e.target === lightbox) closeLightbox();
-  });
-  lightbox.addEventListener('cancel', e => {
-    e.preventDefault();
-    closeLightbox();
-  });
-
-  document.addEventListener('keydown', e => {
-    if (!lightbox.open) return;
-    if (e.key === 'ArrowLeft') step(-1);
-    else if (e.key === 'ArrowRight') step(+1);
-    else if (e.key === 'Escape') closeLightbox();
-  });
-
-  // Touch swipe
-  let touchX = null;
-  lightbox.addEventListener('touchstart', e => {
-    touchX = e.changedTouches[0].screenX;
-  }, { passive: true });
-  lightbox.addEventListener('touchend', e => {
-    if (touchX == null) return;
-    const dx = e.changedTouches[0].screenX - touchX;
-    if (Math.abs(dx) > 50) step(dx < 0 ? +1 : -1);
-    touchX = null;
-  }, { passive: true });
 })();

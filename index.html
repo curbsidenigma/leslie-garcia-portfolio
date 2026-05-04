@@ -14,33 +14,59 @@
 
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/icons/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/icons/favicon-16.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/icons/apple-touch-icon.png"
+    />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Leslie Garcia" />
     <meta property="og:locale" content="es_MX" />
     <meta property="og:url" content="https://www.lesliegarcia.art/" />
-    <meta property="og:title" content="Leslie Garcia — Aerealista & Bailarina" />
+    <meta
+      property="og:title"
+      content="Leslie Garcia — Aerealista & Bailarina"
+    />
     <meta
       property="og:description"
       content="Portafolio de pole dance aéreo: piezas escénicas, residencias y colaboraciones."
     />
-    <meta property="og:image" content="https://www.lesliegarcia.art/assets/images/og-image.jpg" />
+    <meta
+      property="og:image"
+      content="https://www.lesliegarcia.art/assets/images/og-image.jpg"
+    />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Leslie Garcia — retrato editorial" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Leslie Garcia — Aerealista & Bailarina" />
+    <meta
+      name="twitter:title"
+      content="Leslie Garcia — Aerealista & Bailarina"
+    />
     <meta
       name="twitter:description"
       content="Portafolio de pole dance aéreo: piezas escénicas, residencias y colaboraciones."
     />
-    <meta name="twitter:image" content="https://www.lesliegarcia.art/assets/images/og-image.jpg" />
+    <meta
+      name="twitter:image"
+      content="https://www.lesliegarcia.art/assets/images/og-image.jpg"
+    />
 
     <link
       rel="preload"
@@ -344,27 +370,14 @@
           </p>
         </div>
 
-        <div class="gallery-filters reveal d2" id="galleryFilters" role="tablist" aria-label="Filtrar por serie"></div>
-
-        <div class="gallery-grid" id="galleryGrid" aria-live="polite"></div>
-
-        <noscript>
-          <p style="color: var(--fg-dim); margin-top: 24px">
-            Habilita JavaScript para ver la galería. O escríbeme directamente
-            para recibir el portafolio en PDF.
-          </p>
-        </noscript>
+        <div class="gallery-grid" id="galleryGrid">
+          <div class="g-carousel reveal" data-series="sesion-rawlight-polemaniamx"></div>
+          <div class="g-carousel reveal d1" data-series="luna"></div>
+          <div class="g-carousel reveal d2" data-series="retratos-2026"></div>
+          <div class="g-carousel reveal d2" data-series="agua-y-mezcal"></div>
+          <div class="g-carousel reveal d3" data-series="aerialarts-2025"></div>
+        </div>
       </div>
-
-      <dialog class="lightbox" id="lightbox" aria-label="Visor de imagen">
-        <button class="lb-close" id="lbClose" aria-label="Cerrar">×</button>
-        <button class="lb-nav lb-prev" id="lbPrev" aria-label="Anterior">‹</button>
-        <button class="lb-nav lb-next" id="lbNext" aria-label="Siguiente">›</button>
-        <figure class="lb-figure">
-          <img id="lbImg" alt="" />
-          <figcaption class="lb-caption" id="lbCaption"></figcaption>
-        </figure>
-      </dialog>
     </section>
 
     <hr class="rule" />
